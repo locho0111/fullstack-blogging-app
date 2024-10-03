@@ -1,0 +1,16 @@
+Jenskin plugins:
+  - SonaQube Scanner
+  - Config File Provider
+  - Maven Integration
+  - Pipeline Maven Integration
+  - Kubernetes 
+  - Kubernetes Client API
+  - Kubernetes Credentials
+  - Kubernetes CLI
+  - Docker
+  - Docker Pipeline
+  - Eclipse Termurin installer
+  - Pipeline Stage View
+
+- Create Admin user token
+- Configure Plugins in Tools

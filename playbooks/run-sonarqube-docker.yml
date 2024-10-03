@@ -1,0 +1,31 @@
+- name: Run SonarQube Container
+  hosts: all
+  become: yes
+  tasks:
+    - name: Pull the latest SonarQube Docker image
+      docker_image:
+        name: sonarqube
+        source: pull
+        tag: latest
+
+    - name: Run SonarQube container
+      docker_container:
+        name: sonarqube
+        image: sonarqube:latest
+        state: started
+        ports:
+          - "9000:9000"
+        env:
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+        restart_policy: always
+
+    - name: Wait for SonarQube to be fully up and running
+      wait_for:
+        port: 9000
+        host: "{{ inventory_hostname }}"
+        state: started
+        timeout: 180
+
+    - name: Display SonarQube URL
+      debug:
+        msg: "SonarQube is running and accessible at http://{{ inventory_hostname }}:9000"

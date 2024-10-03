@@ -1,0 +1,56 @@
+- name: Install Jenkins on Ubuntu EC2
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update the APT package index
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required dependencies for adding the GPG key
+      apt:
+        name:
+          - gnupg
+          - curl
+        state: present
+
+    - name: install Java 11
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: Download and add Jenkins GPG key
+      ansible.builtin.shell: curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | gpg --dearmor -o /usr/share/keyrings/jenkins-archive-keyring.gpg
+      become: true
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-archive-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+
+    - name: Start Jenkins service
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Ensure port 8080 is open in UFW (if UFW is used)
+      community.general.ufw:
+        rule: allow
+        port: 8080
+        proto: tcp
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Print Jenkins initial admin password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_password
+
+    - name: Display Jenkins initial admin password
+      debug:
+        msg: "Jenkins initial admin password is {{ jenkins_password.stdout }}"

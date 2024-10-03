@@ -1,0 +1,8 @@
+- name: Install Jenkins
+  ansible.builtin.import_playbook: install-jenkins.yml
+- name: Install Docker
+  ansible.builtin.import_playbook: install-docker.yml
+- name: Run Nexus3 Docker
+  ansible.builtin.import_playbook: run-nexus-docker.yml
+- name: Run SonarQube Docker
+  ansible.builtin.import_playbook: run-sonarqube-docker.yml

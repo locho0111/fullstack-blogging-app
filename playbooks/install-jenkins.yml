@@ -14,9 +14,9 @@
           - curl
         state: present
 
-    - name: install Java 11
+    - name: install Java 17
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jdk
         state: present
 
     - name: Download and add Jenkins GPG key

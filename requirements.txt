@@ -14,3 +14,8 @@ Jenskin plugins:
 
 - Create Admin user token
 - Configure Plugins in Tools
+
+Jenkins tools:
+  - Java 17
+  - Maven 3
+  - 

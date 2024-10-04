@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: blog-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: blog-app
+    spec:
+      containers:
+        - name: blog-app
+          image: rickho0111/blog-app:latest # Updated image to private DockerHub image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+      # imagePullSecrets:
+      #   - name: regcred # Reference to the Docker registry secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-app-ssvc
+spec:
+  selector:
+    app: blog-app
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

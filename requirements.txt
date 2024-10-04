@@ -11,6 +11,7 @@ Jenskin plugins:
   - Docker Pipeline
   - Eclipse Termurin installer
   - Pipeline Stage View
+  - NEXUS artifect uploader
 
 - Create Admin user token
 - Configure Plugins in Tools

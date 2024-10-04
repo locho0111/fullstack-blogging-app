@@ -4,6 +4,10 @@ resource "aws_instance" "jenkins" {
   key_name                    = var.aws_key_name
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.jenkins_sg.id]
+  root_block_device {
+    volume_size = 20
+  }
+
   tags = {
     Name = "Jenkins"
   }

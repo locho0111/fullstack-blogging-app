@@ -49,11 +49,11 @@ pipeline {
         //     }
         // }
         
-        stage('Build artifact') {
-            steps {
-                sh "mvn package"
-            }
-        }
+        // stage('Build artifact') {
+        //     steps {
+        //         sh "mvn package"
+        //     }
+        // }
         
         // stage("Publish to Nexus Repository Manager") {
         //     steps {
@@ -92,31 +92,83 @@ pipeline {
             
         // }
         
-        stage('Docker build') {
-            steps {
-                script{
-                    withDockerRegistry(credentialsId: 'DOCKER_CRED', toolName: 'DOCKER') {
-                        sh "docker build -t rickho0111/blog-app:latest ."
-                    }
-                }
+        // stage('Docker build') {
+        //     steps {
+        //         script{
+        //             withDockerRegistry(credentialsId: 'DOCKER_CRED', toolName: 'DOCKER') {
+        //                 sh "docker build -t rickho0111/blog-app:latest ."
+        //             }
+        //         }
                 
+        //     }
+        // }
+        
+        // stage('Trivy Image scan') {
+        //     steps {
+        //         sh "trivy image -f table -o image.html rickho0111/blog-app:latest"
+        //     }
+        // }
+        
+        // stage('Docker push') {
+        //     steps {
+        //         script{
+        //             withDockerRegistry(credentialsId: 'DOCKER_CRED', toolName: 'DOCKER') {
+        //                 sh "docker push rickho0111/blog-app:latest "
+        //             }
+        //         }
+                
+        //     }
+        // }
+        
+        stage('Kubernetes deploy') {
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: 'my-eks-cluster', contextName: '', credentialsId: 'K8_CRED', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://D62025BB82FB5CEEB89FEBAAC6570523.gr7.us-east-1.eks.amazonaws.com') {
+                    sh "kubectl apply -f deployment-service.yml"
+                    sleep 20
+                }
             }
         }
         
-        stage('Trivy Image scan') {
+        stage('Verify Kubernetes deployment') {
             steps {
-                sh "trivy image -f table -o image.html rickho0111/blog-app:latest"
+                withKubeConfig(caCertificate: '', clusterName: 'my-eks-cluster', contextName: '', credentialsId: 'K8_CRED', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://D62025BB82FB5CEEB89FEBAAC6570523.gr7.us-east-1.eks.amazonaws.com') {
+                    sh "kubectl get pods"
+                    sh "kubectl get svc"
+                }
             }
         }
-        
-        stage('Docker push') {
-            steps {
-                script{
-                    withDockerRegistry(credentialsId: 'DOCKER_CRED', toolName: 'DOCKER') {
-                        sh "docker push rickho0111/blog-app:latest "
-                    }
-                }
-                
+    }
+
+    post {
+        always {
+            script {
+                def jobName = env.JOB_NAME
+                def buildNumber = env.BUILD_NUMBER
+                def pipelineStatus = currentBuild.result ?: 'UNKNOWN'
+                def bannerColor = pipelineStatus.toUpperCase() == 'SUCCESS' ? 'green' : 'red'
+
+                def body = """
+                <html>
+                <body>
+                    <div style="border: 4px solid ${bannerColor}; padding: 10px;">
+                        <h2>${jobName} - Build ${buildNumber}</h2>
+                        <div style="background-color: ${bannerColor}; padding: 10px;">
+                            <h3 style="color: white;">Pipeline Status: ${pipelineStatus.toUpperCase()}</h3>
+                        </div>
+                        <p>Check the <a href="${BUILD_URL}">console output</a>.</p>
+                    </div>
+                </body>
+                </html>
+                """
+
+                emailext (
+                    subject: "${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
+                    body: body,
+                    to: 'your_email@example.com', // Change to recipient email
+                    from: 'jenkins@example.com',
+                    replyTo: 'jenkins@example.com',
+                    mimeType: 'text/html'
+                )
             }
         }
     }

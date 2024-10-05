@@ -3,7 +3,7 @@ module "eks" {
   version = "~> 20.0"
 
   cluster_name    = local.name
-  cluster_version = "1.28"
+  cluster_version = "1.29"
 
   cluster_endpoint_public_access = true
 
@@ -26,7 +26,7 @@ module "eks" {
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["t2.micro", "t2.small", "t2.medium"]
+    instance_types = ["t2.medium"]
 
     attach_cluster_primary_security_group = true
   }

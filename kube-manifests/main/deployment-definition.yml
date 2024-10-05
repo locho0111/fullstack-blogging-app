@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-deployment
+  labels:
+    app: my-app
+spec:
+  replicas: 2 # Number of pod replicas
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      name: my-app-pod
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app-container
+          image: rickho0111/blog-app:latest # Replace with your image
+          ports:
+            - containerPort: 8080

@@ -2,6 +2,12 @@
 
 This project demonstrates the setup and deployment of a complete CI/CD pipeline using various DevOps tools on AWS. The infrastructure is provisioned using Terraform, Ansible is integrated for configuration management, and Docker containers are used for running the CI/CD tools such as Jenkins, Nexus, SonarQube, and Trivy.
 
+## CI/CD Pipeline
+
+Below is the architecture diagram for the CI/CD pipeline:
+
+![Pipeline Diagram](images/pipeline.png)
+
 ## Technologies Used
 
 ### 1. **Terraform**
